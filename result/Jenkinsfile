@@ -1,6 +1,10 @@
 pipeline {
   agent any
 
+  tools{
+    NodeJS 'node 22.4.0'
+  }
+
   stages {
     stage("build"){
       when{
