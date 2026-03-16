@@ -1,0 +1,38 @@
+pipeline {
+  agent any
+
+  stages {
+    stage("build"){
+      when{
+        changeset "**/result/**"
+      }
+
+      steps{
+        dir("result")
+        sh 'npm install'
+      }
+    }
+    stage("test"){
+      when{
+        changeset "**/result/**"
+      }
+      
+      steps{
+        dir("result")
+        sh 'npm install && npm test'
+      }
+    }
+  }
+
+  post{
+    failure{
+      slackSend (channel: "#jenkins-alert", message: "Build Failed: ${env.JOB_NAME} ${env.BUILD_NUMBER}")
+    }
+    success{
+      slackSend (channel: "#jenkins-alert", message: "Build Success: ${env.JOB_NAME} ${env.BUILD_NUMBER}")
+    }
+    always{
+      echo 'This pipeline is completed.'
+    }
+  }
+}
