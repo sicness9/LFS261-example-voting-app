@@ -1,10 +1,6 @@
 pipeline {
   agent any
 
-  tools{
-    NodeJS 'node 22.4.0'
-  }
-
   stages {
     stage("build"){
       when{
@@ -14,8 +10,10 @@ pipeline {
       steps{
         echo 'Building result app'
         dir("result"){
-        sh 'npm install'
+        nodejs(nodeJSInstallationName: 'node 22.4.0') {
+          sh 'npm install'
         }
+      }
       }
     }
     stage("test"){
@@ -26,7 +24,8 @@ pipeline {
       steps{
         echo 'Running Unit Tests on result app'
         dir("result"){
-        sh 'npm install && npm test'
+        nodejs(nodeJSInstallationName: 'node 22.4.0') {
+          sh 'npm install && npm test'
         }
       }
     }
