@@ -1,5 +1,9 @@
 pipeline {
-  agent any
+  agent {
+    docker {
+      image 'node 22.4.0'
+    }
+  }
 
   stages {
     stage("build"){
@@ -10,10 +14,8 @@ pipeline {
       steps{
         echo 'Building result app'
         dir("result"){
-        nodejs(nodeJSInstallationName: 'node 22.4.0') {
           sh 'npm install'
         }
-      }
       }
     }
     stage("test"){
@@ -24,10 +26,8 @@ pipeline {
       steps{
         echo 'Running Unit Tests on result app'
         dir("result"){
-        nodejs(nodeJSInstallationName: 'node 22.4.0') {
           sh 'npm install && npm test'
         }
-      }
     }
   }
   }
