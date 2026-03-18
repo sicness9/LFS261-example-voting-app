@@ -139,30 +139,28 @@ pipeline {
                 }
             }
             stages {
-                stages {
-                    stage('build') {
-                        when {
-                            changeset '**/result/**'
-                        }
+                stage('build') {
+                    when {
+                        changeset '**/result/**'
+                    }
 
-                        steps {
-                            echo 'Building result app'
-                            dir('result') {
-                                sh 'npm install'
-                            }
+                    steps {
+                        echo 'Building result app'
+                        dir('result') {
+                            sh 'npm install'
                         }
                     }
-                    stage('test') {
-                        when {
-                            changeset '**/result/**'
-                        }
+                }
+                stage('test') {
+                    when {
+                        changeset '**/result/**'
+                    }
 
-                        steps {
-                            echo 'Running Unit Tests on result app'
-                            dir('result') {
-                                sh 'npm install'
-                                sh 'npm test'
-                            }
+                    steps {
+                        echo 'Running Unit Tests on result app'
+                        dir('result') {
+                            sh 'npm install'
+                            sh 'npm test'
                         }
                     }
                 }
