@@ -133,13 +133,12 @@ pipeline {
             }
         }
         stage('result') {
-            stages {
-                agent {
-                    docker {
-                        image 'node:22.4.0'
-                    }
+            agent {
+                docker {
+                    image 'node:22.4.0'
                 }
-
+            }
+            stages {
                 stages {
                     stage('build') {
                         when {
