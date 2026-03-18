@@ -31,4 +31,4 @@ COPY . .
 EXPOSE 80
 
 # defind our command to run  when launching container
-CMD ["gunicorn", "app:app", "-b", "0.0.0.0:80", "--log-file", "-","--access-log", "-", "--workers", "4", "--keep-alive", "0"]
+CMD ["gunicorn", "app:app", "-b", "0.0.0.0:80", "--log-file", "-", "--access-logfile", "-", "--workers", "4", "--keep-alive", "0"]
