@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('worker') {
             stages {
-                stage('build') {
+                stage('worker-build') {
                     when {
                         changeset '**/worker/**'
                     }
@@ -21,7 +21,7 @@ pipeline {
                         }
                     }
                 }
-                stage('test') {
+                stage('worker-test') {
                     when {
                         changeset '**/worker/**'
                     }
@@ -40,7 +40,7 @@ pipeline {
                         }
                     }
                 }
-                stage('package') {
+                stage('worker-package') {
                     when {
                         branch 'master'
                         changeset '**/worker/**'
@@ -61,7 +61,7 @@ pipeline {
                         }
                     }
                 }
-                stage('docker-package') {
+                stage('worker-docker-package') {
                     agent any
                     when {
                         changeset '**/worker/**'
@@ -82,12 +82,15 @@ pipeline {
         }
         stage('vote') {
             stages {
-                stage('build') {
+                stage('vote-build') {
                     agent {
                         docker {
                             image 'python:3.11-slim'
                             args '--user root'
                         }
+                    }
+                    when {
+                        changeset '**/vote/**'
                     }
 
                     steps {
@@ -97,13 +100,17 @@ pipeline {
                         }
                     }
                 }
-                stage('test') {
+                stage('vote-test') {
                     agent {
                         docker {
                             image 'python:3.11-slim'
                             args '--user root'
                         }
                     }
+                    when {
+                        changeset '**/vote/**'
+                    }
+
                     steps {
                         echo 'Running Unit Tests on vote app.'
                         dir('vote') {
@@ -115,6 +122,10 @@ pipeline {
 
                 stage('vote-docker-package') {
                     agent any
+                    when {
+                        changeset '**/vote/**'
+                        branch 'master'
+                    }
 
                     steps {
                         echo 'Packaging vote app with docker'
@@ -137,7 +148,7 @@ pipeline {
                 }
             }
             stages {
-                stage('build') {
+                stage('result-build') {
                     when {
                         changeset '**/result/**'
                     }
@@ -149,7 +160,7 @@ pipeline {
                         }
                     }
                 }
-                stage('test') {
+                stage('result-test') {
                     when {
                         changeset '**/result/**'
                     }
@@ -159,6 +170,24 @@ pipeline {
                         dir('result') {
                             sh 'npm install'
                             sh 'npm test'
+                        }
+                    }
+                }
+                stage('result-docker-package') {
+                    agent any
+                    when {
+                        changeset '**/result/**'
+                        branch 'master'
+                    }
+
+                    steps {
+                        echo 'Packaging result app with docker'
+                        script {
+                            docker.withRegistry('https://index.docker.io/v1/', 'dockerlogin') {
+                                def resultImage = docker.build("sicness9/result:v${env.BUILD_ID}", '/.vote')
+                                resultImage.push()
+                                resultImage.push('latest')
+                            }
                         }
                     }
                 }
